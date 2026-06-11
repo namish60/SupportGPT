@@ -1,0 +1,241 @@
+import streamlit as st
+import uuid
+from datetime import datetime
+
+# Page Configuration
+st.set_page_config(
+    page_title="SupportGPT",
+    page_icon="🤖",
+    layout="wide"
+)
+
+# Custom Styling
+st.markdown("""
+<style>
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.main-title {
+    text-align: center;
+    font-size: 72px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+            
+.sub-title {
+    text-align: center;
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 30px;
+    font-weight: 500;
+}
+
+.stContainer {
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,245,255,0.95) 100%);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.stButton>button {
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+}
+            
+.stButton {
+    display: flex;
+    justify-content: center;
+}
+
+.stButton > button {
+    width: 200px;
+    height: 60px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #90EE90 0%, #76D776 100%);
+    border: 2px solid #228B22;
+    color: #1a5c1a;
+    box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    background: linear-gradient(135deg, #76D776 0%, #5cbb5c 100%);
+    border: 3px solid #1a5c1a;
+    box-shadow: 0 6px 20px rgba(34, 139, 34, 0.5);
+    transform: translateY(-2px);
+}
+
+.stTextInput > div > div > input {
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    font-size: 16px;
+}
+
+.stTextInput > div > div > input:focus {
+    border: 2px solid #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.stSelectbox > div > div > select {
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.stTextArea > div > div > textarea {
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    font-size: 15px;
+}
+
+.stTextArea > div > div > textarea:focus {
+    border: 2px solid #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.priority-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.ticket-id {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 0;
+}
+
+.helpdesk-footer {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.helpdesk-title {
+    color: #667eea;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.helpdesk-contact {
+    color: #555;
+    font-size: 14px;
+    margin: 5px 0;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Header
+st.markdown(
+    '<p class="main-title">🤖 Welcome to SupportGPT</p>',
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<p class="sub-title">AI Powered Employee Support Assistant</p>',
+    unsafe_allow_html=True
+)
+
+# Card-like Container
+with st.container(border=True):
+
+    st.subheader("📝 Raise a Support Ticket")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        employee_name = st.text_input(
+            "Employee Name",
+            placeholder="Enter your full name"
+        )
+
+        employee_id = st.text_input(
+            "Employee ID",
+            placeholder="EMP12345"
+        )
+
+    with col2:
+        department = st.text_input(
+            "Department",
+            placeholder="Engineering / HR / Finance"
+        )
+
+        priority = st.selectbox(
+            "Priority",
+            [
+                "🟢 Low",
+                "🟡 Medium",
+                "🔶 High"
+            ]
+        )
+
+    issue_description = st.text_area(
+        "Describe Your Issue",
+        height=150,
+        placeholder="""
+Example:
+I am unable to connect to the VPN while working remotely.
+"""
+    )
+
+    # Center the submit button at the bottom
+    button_col1, button_col2, button_col3 = st.columns([1, 1, 1])
+    with button_col2:
+        submitted = st.button(" Submit Ticket")
+
+if submitted:
+
+    if not employee_name or not employee_id or not department or not issue_description:
+
+        st.error("Please fill all required fields.")
+
+    else:
+        with st.spinner("🔄 Processing your ticket..."):
+            import time
+            time.sleep(1)  # Simulate processing time
+
+        # Generate unique ticket ID
+        ticket_id = f"TKT-{str(uuid.uuid4())[:8].upper()}-{datetime.now().strftime('%Y%m%d')}"
+        
+        st.success("✅ Ticket Submitted Successfully!")
+
+        # Display Ticket ID
+        st.markdown(f'<div class="ticket-id">🎫 Ticket ID: {ticket_id}</div>', unsafe_allow_html=True)
+
+        st.write("### 📋 Ticket Summary")
+
+        st.write(f"**Employee Name:** {employee_name}")
+        st.write(f"**Employee ID:** {employee_id}")
+        st.write(f"**Department:** {department}")
+        st.write(f"**Priority:** {priority}")
+        st.write(f"**Issue Description:** {issue_description}")
+        st.write(f"**Submitted At:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+# Help Desk Contact Info Footer
+st.markdown("""
+<div class="helpdesk-footer">
+    <div class="helpdesk-title">📞 Help Desk Contact Information</div>
+    <div class="helpdesk-contact">📧 <strong>Email:</strong> support@company.com</div>
+    <div class="helpdesk-contact">📱 <strong>Phone:</strong> +1 (555) 123-4567</div>
+    <div class="helpdesk-contact">⏰ <strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM</div>
+    <div class="helpdesk-contact">🔗 <strong>Live Chat:</strong> Available during business hours</div>
+</div>
+""", unsafe_allow_html=True)
