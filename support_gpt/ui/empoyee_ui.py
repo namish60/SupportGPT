@@ -2,15 +2,13 @@ import streamlit as st
 import uuid
 from datetime import datetime
 
-# Page Configuration
-st.set_page_config(
-    page_title="SupportGPT",
-    page_icon="🤖",
-    layout="wide"
-)
+def show(on_logout):
+    """Employee dashboard"""
+    # Page Configuration
+    # Page config already set in app.py
 
-# Custom Styling
-st.markdown("""
+    # Custom Styling
+    st.markdown("""
 <style>
 body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -143,94 +141,100 @@ body {
 </style>
 """, unsafe_allow_html=True)
 
-# Header
-st.markdown(
-    '<p class="main-title">🤖 Welcome to SupportGPT</p>',
-    unsafe_allow_html=True
-)
+    # Header
+    st.markdown(
+        '<p class="main-title">🤖 Welcome to SupportGPT</p>',
+        unsafe_allow_html=True
+    )
 
-st.markdown(
-    '<p class="sub-title">AI Powered Employee Support Assistant</p>',
-    unsafe_allow_html=True
-)
+    st.markdown(
+        '<p class="sub-title">AI Powered Employee Support Assistant</p>',
+        unsafe_allow_html=True
+    )
 
-# Card-like Container
-with st.container(border=True):
+    # Logout button in header
+    col_logout = st.columns([8, 2])
+    with col_logout[1]:
+        if st.button("🚪 Logout", use_container_width=True, key="emp_logout_btn"):
+            on_logout()
 
-    st.subheader("📝 Raise a Support Ticket")
+    # Card-like Container
+    with st.container(border=True):
 
-    col1, col2 = st.columns(2)
+        st.subheader("📝 Raise a Support Ticket")
 
-    with col1:
-        employee_name = st.text_input(
-            "Employee Name",
-            placeholder="Enter your full name"
-        )
+        col1, col2 = st.columns(2)
 
-        employee_id = st.text_input(
-            "Employee ID",
-            placeholder="EMP12345"
-        )
+        with col1:
+            employee_name = st.text_input(
+                "Employee Name",
+                placeholder="Enter your full name"
+            )
 
-    with col2:
-        department = st.text_input(
-            "Department",
-            placeholder="Engineering / HR / Finance"
-        )
+            employee_id = st.text_input(
+                "Employee ID",
+                placeholder="EMP12345"
+            )
 
-        priority = st.selectbox(
-            "Priority",
-            [
-                "🟢 Low",
-                "🟡 Medium",
-                "🔶 High"
-            ]
-        )
+        with col2:
+            department = st.text_input(
+                "Department",
+                placeholder="Engineering / HR / Finance"
+            )
 
-    issue_description = st.text_area(
-        "Describe Your Issue",
-        height=150,
-        placeholder="""
+            priority = st.selectbox(
+                "Priority",
+                [
+                    "🟢 Low",
+                    "🟡 Medium",
+                    "🔶 High"
+                ]
+            )
+
+        issue_description = st.text_area(
+            "Describe Your Issue",
+            height=150,
+            placeholder="""
 Example:
 I am unable to connect to the VPN while working remotely.
 """
-    )
+        )
 
-    # Center the submit button at the bottom
-    button_col1, button_col2, button_col3 = st.columns([1, 1, 1])
-    with button_col2:
-        submitted = st.button(" Submit Ticket")
+        # Center the submit button at the bottom
+        button_col1, button_col2, button_col3 = st.columns([1, 1, 1])
+        with button_col2:
+            submitted = st.button(" Submit Ticket")
 
-if submitted:
+    if submitted:
 
-    if not employee_name or not employee_id or not department or not issue_description:
+        if not employee_name or not employee_id or not department or not issue_description:
 
-        st.error("Please fill all required fields.")
+            st.error("Please fill all required fields.")
 
-    else:
-        with st.spinner("🔄 Processing your ticket..."):
-            import time
-            time.sleep(1)  # Simulate processing time
+        else:
+            with st.spinner("🔄 Processing your ticket..."):
+                import time
+                time.sleep(1)  # Simulate processing time
 
-        # Generate unique ticket ID
-        ticket_id = f"TKT-{str(uuid.uuid4())[:8].upper()}-{datetime.now().strftime('%Y%m%d')}"
-        
-        st.success("✅ Ticket Submitted Successfully!")
+            # Generate unique ticket ID
+            ticket_id = f"TKT-{str(uuid.uuid4())[:8].upper()}-{datetime.now().strftime('%Y%m%d')}"
+            
+            st.success("✅ Ticket Submitted Successfully!")
 
-        # Display Ticket ID
-        st.markdown(f'<div class="ticket-id">🎫 Ticket ID: {ticket_id}</div>', unsafe_allow_html=True)
+            # Display Ticket ID
+            st.markdown(f'<div class="ticket-id">🎫 Ticket ID: {ticket_id}</div>', unsafe_allow_html=True)
 
-        st.write("### 📋 Ticket Summary")
+            st.write("### 📋 Ticket Summary")
 
-        st.write(f"**Employee Name:** {employee_name}")
-        st.write(f"**Employee ID:** {employee_id}")
-        st.write(f"**Department:** {department}")
-        st.write(f"**Priority:** {priority}")
-        st.write(f"**Issue Description:** {issue_description}")
-        st.write(f"**Submitted At:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            st.write(f"**Employee Name:** {employee_name}")
+            st.write(f"**Employee ID:** {employee_id}")
+            st.write(f"**Department:** {department}")
+            st.write(f"**Priority:** {priority}")
+            st.write(f"**Issue Description:** {issue_description}")
+            st.write(f"**Submitted At:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-# Help Desk Contact Info Footer
-st.markdown("""
+    # Help Desk Contact Info Footer
+    st.markdown("""
 <div class="helpdesk-footer">
     <div class="helpdesk-title">📞 Help Desk Contact Information</div>
     <div class="helpdesk-contact">📧 <strong>Email:</strong> support@company.com</div>
