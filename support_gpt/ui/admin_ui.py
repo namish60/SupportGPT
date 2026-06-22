@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from database import get_all_tickets, get_ticket_by_id, update_ticket_status, get_ticket_count
 
 def show(on_logout):
     """Admin dashboard"""
@@ -72,35 +73,40 @@ def show(on_logout):
     # ---------------------------------------------------
     # METRICS
     # ---------------------------------------------------
+    
+    # Get tickets from database
+    all_tickets = get_all_tickets()
+    open_tickets = [t for t in all_tickets if t[7] == 'Open']  # status is at index 7
+    closed_tickets = [t for t in all_tickets if t[7] == 'Closed']
 
     c1,c2,c3,c4=st.columns(4)
 
     with c1:
         st.metric(
-            "Pending Tickets",
-            "14",
-            "+2"
+            "Total Tickets",
+            len(all_tickets),
+            f"+{len(open_tickets)} open"
         )
 
     with c2:
         st.metric(
-            "Approved Today",
-            "8",
-            "+3"
+            "Open Tickets",
+            len(open_tickets),
+            "Pending Response"
         )
 
     with c3:
         st.metric(
-            "Rejected",
-            "2",
-            "-1"
+            "Resolved Tickets",
+            len(closed_tickets),
+            "Completed"
         )
 
     with c4:
         st.metric(
-            "AI Accuracy",
-            "96%",
-            "+1%"
+            "System Status",
+            "Operational",
+            "✓ All Good"
         )
 
     st.divider()
@@ -109,129 +115,123 @@ def show(on_logout):
     # TABLE
     # ---------------------------------------------------
 
-    st.subheader("📋 Pending Support Tickets")
+    st.subheader("📋 All Support Tickets")
 
-    df=pd.DataFrame({
+    if all_tickets:
+        # Prepare data for display
+        table_data = []
+        for ticket in all_tickets:
+            table_data.append({
+                "Ticket ID": ticket[0],
+                "Employee Name": ticket[1],
+                "Employee ID": ticket[2],
+                "Department": ticket[3],
+                "Priority": ticket[4],
+                "Status": ticket[7],
+                "Submitted": ticket[6]
+            })
 
-    "Ticket ID":[101,102,103],
-
-    "Employee":["John","Rahul","Priya"],
-
-    "Category":["VPN","Payroll","Password"],
-
-    "Priority":["High","Medium","Low"],
-
-    "Status":["Pending","Pending","Pending"]
-
-    })
-
-    st.dataframe(
-        df,
-        use_container_width=True,
-        hide_index=True
-    )
+        df = pd.DataFrame(table_data)
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True
+        )
+    else:
+        st.info("No tickets found in the system yet.")
 
     st.divider()
 
     # ---------------------------------------------------
-    # TICKET DETAILS
+    # TICKET DETAILS & SELECTION
     # ---------------------------------------------------
 
-    left,right=st.columns([2,1])
-
-    with left:
-
-        with st.container(border=True):
-
-            st.subheader("🎫 Ticket Details")
-
-            st.write("**Employee Name:** John Smith")
-
-            st.write("**Employee ID:** EMP1023")
-
-            st.write("**Department:** Engineering")
-
-            st.write("**Issue Category:** VPN Issue")
-
-            st.write("**Priority:** High")
-
-            st.write("### Issue Description")
-
-            st.info("""
-Unable to connect to the company VPN after
-changing my password.
-Error Code : 720
-Tried restarting laptop but issue persists.
-""")
-
-            st.write("")
-
-            st.subheader("🤖 AI Generated Response")
-
-            st.success("""
-Hello John,
-
-Based on the retrieved knowledge base,
-please restart your VPN client and login again
-using your updated password.
-
-If the issue still exists,
-please reinstall the VPN client or contact
-Network Support.
-
-Regards,
-SupportGPT
-""")
-
-    with right:
-
-        with st.container(border=True):
-
-            st.subheader("📚 Retrieved Documents")
-
-            st.success("vpn_troubleshooting.md")
-
-            st.success("password_reset.md")
-
-            st.success("network_access.md")
-
-            st.write("")
-
-            st.subheader("🛡 Guardrail Validation")
-
-            st.success("✓ Hallucination Check Passed")
-
-            st.success("✓ Sensitive Data Check Passed")
-
-            st.success("✓ Company Policy Passed")
-
-            st.success("✓ Confidence : 94%")
-
-    st.divider()
-
-    # ---------------------------------------------------
-    # ACTIONS
-    # ---------------------------------------------------
-
-    b1,b2,b3=st.columns(3)
-
-    with b1:
-
-        st.button(
-            "✅ Approve Response",
-            use_container_width=True
+    if all_tickets:
+        st.subheader("🔍 Ticket Details Viewer")
+        
+        # Create a selectbox to choose a ticket
+        ticket_options = {f"{t[0]} - {t[1]}": t[0] for t in all_tickets}
+        selected_ticket_label = st.selectbox(
+            "Select a ticket to view details:",
+            list(ticket_options.keys())
         )
+        
+        selected_ticket_id = ticket_options[selected_ticket_label]
+        selected_ticket = get_ticket_by_id(selected_ticket_id)
+        
+        if selected_ticket:
+            left,right=st.columns([2,1])
 
-    with b2:
+            with left:
 
-        st.button(
-            "✏ Edit Response",
-            use_container_width=True
-        )
+                with st.container(border=True):
 
-    with b3:
+                    st.subheader("🎫 Ticket Details")
 
-        st.button(
-            "❌ Reject Response",
-            use_container_width=True
-        )
+                    st.write(f"**Ticket ID:** {selected_ticket[0]}")
+                    st.write(f"**Employee Name:** {selected_ticket[1]}")
+                    st.write(f"**Employee ID:** {selected_ticket[2]}")
+                    st.write(f"**Department:** {selected_ticket[3]}")
+                    st.write(f"**Priority:** {selected_ticket[4]}")
+                    st.write(f"**Status:** {selected_ticket[7]}")
+                    st.write(f"**Submitted Date:** {selected_ticket[6]}")
+
+                    st.write("### 📝 Issue Description")
+
+                    st.info(selected_ticket[5])
+
+            with right:
+
+                with st.container(border=True):
+
+                    st.subheader("⚙️ Ticket Actions")
+
+                    # Status update buttons
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        if st.button("✅ Mark as Resolved", use_container_width=True):
+                            if update_ticket_status(selected_ticket_id, 'Closed'):
+                                st.success("Ticket marked as resolved!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button("🔄 Reopen Ticket", use_container_width=True):
+                            if update_ticket_status(selected_ticket_id, 'Open'):
+                                st.success("Ticket reopened!")
+                                st.rerun()
+
+                    st.divider()
+                    
+                    st.subheader("📊 Stats")
+                    st.write(f"**Current Status:** {selected_ticket[7]}")
+                    st.write(f"**Priority Level:** {selected_ticket[4]}")
+
+            st.divider()
+
+            # ---------------------------------------------------
+            # ACTIONS
+            # ---------------------------------------------------
+
+            b1,b2,b3=st.columns(3)
+
+            with b1:
+                if st.button(
+                    "✅ Approve Response",
+                    use_container_width=True
+                ):
+                    st.success("Response approved!")
+
+            with b2:
+                if st.button(
+                    "✏ Edit Response",
+                    use_container_width=True
+                ):
+                    st.info("Edit mode would open here")
+
+            with b3:
+                if st.button(
+                    "❌ Reject Response",
+                    use_container_width=True
+                ):
+                    st.error("Response rejected")

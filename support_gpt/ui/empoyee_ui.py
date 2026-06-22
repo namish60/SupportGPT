@@ -1,6 +1,7 @@
 import streamlit as st
 import uuid
 from datetime import datetime
+from database import save_ticket, init_database
 
 def show(on_logout):
     """Employee dashboard"""
@@ -162,24 +163,33 @@ body {
     with st.container(border=True):
 
         st.subheader("📝 Raise a Support Ticket")
+        
+        # Display logged-in employee info
+        st.info(f"👤 **Logged in as:** {st.session_state.emp_name} ({st.session_state.emp_id})")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            employee_name = st.text_input(
+            # Display employee name (read-only)
+            st.text_input(
                 "Employee Name",
-                placeholder="Enter your full name"
+                value=st.session_state.emp_name,
+                disabled=True
             )
 
-            employee_id = st.text_input(
+            # Display employee ID (read-only)
+            st.text_input(
                 "Employee ID",
-                placeholder="EMP12345"
+                value=st.session_state.emp_id,
+                disabled=True
             )
 
         with col2:
-            department = st.text_input(
+            # Display department (read-only)
+            st.text_input(
                 "Department",
-                placeholder="Engineering / HR / Finance"
+                value=st.session_state.department,
+                disabled=True
             )
 
             priority = st.selectbox(
@@ -207,31 +217,44 @@ I am unable to connect to the VPN while working remotely.
 
     if submitted:
 
-        if not employee_name or not employee_id or not department or not issue_description:
+        if not issue_description:
 
-            st.error("Please fill all required fields.")
+            st.error("Please describe your issue.")
 
         else:
             with st.spinner("🔄 Processing your ticket..."):
                 import time
                 time.sleep(1)  # Simulate processing time
 
-            # Generate unique ticket ID
-            ticket_id = f"TKT-{str(uuid.uuid4())[:8].upper()}-{datetime.now().strftime('%Y%m%d')}"
+                # Generate unique ticket ID
+                ticket_id = f"TKT-{str(uuid.uuid4())[:8].upper()}-{datetime.now().strftime('%Y%m%d')}"
+                
+                # Save ticket to database using session state values
+                success = save_ticket(
+                    ticket_id=ticket_id,
+                    emp_name=st.session_state.emp_name,
+                    emp_id=st.session_state.emp_id,
+                    department=st.session_state.department,
+                    priority=priority,
+                    issue_description=issue_description
+                )
             
-            st.success("✅ Ticket Submitted Successfully!")
+            if success:
+                st.success("✅ Ticket Submitted Successfully!")
 
-            # Display Ticket ID
-            st.markdown(f'<div class="ticket-id">🎫 Ticket ID: {ticket_id}</div>', unsafe_allow_html=True)
+                # Display Ticket ID
+                st.markdown(f'<div class="ticket-id">🎫 Ticket ID: {ticket_id}</div>', unsafe_allow_html=True)
 
-            st.write("### 📋 Ticket Summary")
+                st.write("### 📋 Ticket Summary")
 
-            st.write(f"**Employee Name:** {employee_name}")
-            st.write(f"**Employee ID:** {employee_id}")
-            st.write(f"**Department:** {department}")
-            st.write(f"**Priority:** {priority}")
-            st.write(f"**Issue Description:** {issue_description}")
-            st.write(f"**Submitted At:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                st.write(f"**Employee Name:** {st.session_state.emp_name}")
+                st.write(f"**Employee ID:** {st.session_state.emp_id}")
+                st.write(f"**Department:** {st.session_state.department}")
+                st.write(f"**Priority:** {priority}")
+                st.write(f"**Issue Description:** {issue_description}")
+                st.write(f"**Submitted At:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            else:
+                st.error("❌ Error saving ticket to database. Please try again.")
 
     # Help Desk Contact Info Footer
     st.markdown("""

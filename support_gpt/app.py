@@ -26,6 +26,19 @@ if "user_type" not in st.session_state:
 if "username" not in st.session_state:
     st.session_state.username = None
 
+# Employee-specific session state
+if "emp_id" not in st.session_state:
+    st.session_state.emp_id = None
+
+if "emp_name" not in st.session_state:
+    st.session_state.emp_name = None
+
+if "email" not in st.session_state:
+    st.session_state.email = None
+
+if "department" not in st.session_state:
+    st.session_state.department = None
+
 # -------------------------------------------------
 # Navigation Functions
 # -------------------------------------------------
@@ -59,7 +72,15 @@ def go_to_admin_dashboard():
 
 def logout():
     """Logout and return to landing"""
-    go_to_landing()
+    st.session_state.page = "landing"
+    st.session_state.authenticated = False
+    st.session_state.user_type = None
+    st.session_state.username = None
+    # Clear employee-specific session state
+    st.session_state.emp_id = None
+    st.session_state.emp_name = None
+    st.session_state.email = None
+    st.session_state.department = None
     st.rerun()
 
 # -------------------------------------------------
