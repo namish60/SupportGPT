@@ -195,17 +195,45 @@ def show(on_logout):
                                 st.success("Ticket marked as resolved!")
                                 st.rerun()
                     
+                    # with col2:
+                    #     if st.button("🔄 Reopen Ticket", use_container_width=True):
+                    #         if update_ticket_status(selected_ticket_id, 'Open'):
+                    #             st.success("Ticket reopened!")
+                    #             st.rerun()
+
                     with col2:
+
                         if st.button("🔄 Reopen Ticket", use_container_width=True):
                             if update_ticket_status(selected_ticket_id, 'Open'):
                                 st.success("Ticket reopened!")
                                 st.rerun()
 
+                    # ==========================
+                    # ASSIGN LLM BUTTON
+                    # ==========================
+
                     st.divider()
-                    
+
+                    st.subheader("🤖 LLM Assignment")
+
+                    if st.button(
+                        "🚀 Assign LLM",
+                        use_container_width=True,
+                        type="primary",
+                        key=f"assign_llm_{selected_ticket_id}"
+                    ):
+                        st.session_state["page"] = "assign_llm"
+                        st.session_state["selected_ticket"] = selected_ticket_id
+                        st.rerun()
+                        
+
+                    st.divider()
+
                     st.subheader("📊 Stats")
                     st.write(f"**Current Status:** {selected_ticket[7]}")
                     st.write(f"**Priority Level:** {selected_ticket[4]}")
+
+                    
 
             st.divider()
 

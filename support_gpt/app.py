@@ -70,6 +70,10 @@ def go_to_admin_dashboard():
     st.session_state.page = "admin_dashboard"
     st.session_state.authenticated = True
 
+def go_to_assign_llm():
+    """Navigate to LLM assignment page"""
+    st.session_state.page = "assign_llm"
+
 def logout():
     """Logout and return to landing"""
     st.session_state.page = "landing"
@@ -115,6 +119,14 @@ elif st.session_state.page == "admin_dashboard":
         go_to_landing()
         st.rerun()
 
+elif st.session_state.page == "assign_llm":
+    if st.session_state.authenticated:
+        from ui import assign_llm
+        assign_llm.show()
+    else:
+        go_to_landing()
+        st.rerun()
+        
 else:
     go_to_landing()
     st.rerun()
