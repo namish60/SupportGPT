@@ -239,5 +239,26 @@ def update_employee_password(emp_id, new_password):
         print(f"Error updating password: {e}")
         return False
 
+
+
+def check_duplicate_open_ticket(emp_id, issue_description):
+    conn = sqlite3.connect(DB_PATH)   # use your database name
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT ticket_id
+        FROM tickets
+        WHERE emp_id = ?
+        AND issue_description = ?
+        AND status = 'Open'
+    """, (emp_id, issue_description))
+
+    ticket = cursor.fetchone()
+
+    conn.close()
+
+    return ticket
+
+
 # Initialize database when module is imported
 init_database()

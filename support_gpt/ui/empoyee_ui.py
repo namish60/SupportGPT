@@ -1,7 +1,11 @@
 import streamlit as st
 import uuid
 from datetime import datetime
-from database import save_ticket, init_database
+from database import (
+    save_ticket,
+    init_database,
+    check_duplicate_open_ticket
+)
 
 def show(on_logout):
     """Employee dashboard"""
@@ -222,10 +226,25 @@ I am unable to connect to the VPN while working remotely.
             st.error("Please describe your issue.")
 
         else:
+
+            duplicate = check_duplicate_open_ticket(
+                    st.session_state.emp_id,
+                    issue_description.strip()
+                )
+
+            if duplicate:
+
+                st.warning(
+                        f"⚠️ You already have an open ticket for this issue.\n\n"
+                        f"Existing Ticket ID: **{duplicate[0]}**"
+                    )
+                st.stop()
+
             with st.spinner("🔄 Processing your ticket..."):
                 import time
                 time.sleep(1)  # Simulate processing time
 
+               
                 # Generate unique ticket ID
                 ticket_id = f"TKT-{str(uuid.uuid4())[:8].upper()}-{datetime.now().strftime('%Y%m%d')}"
                 
