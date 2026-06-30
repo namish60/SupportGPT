@@ -51,22 +51,9 @@ body {
     font-size: 18px;
 }
             
-.stButton {
-    display: flex;
-    justify-content: center;
-}
-
-.stButton > button {
-    width: 200px;
-    height: 60px;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #90EE90 0%, #76D776 100%);
-    border: 2px solid #228B22;
-    color: #1a5c1a;
-    box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
-    transition: all 0.3s ease;
+div[data-testid="stButton"] > button {
+    border-radius:10px;
+    font-weight:bold;
 }
 
 .stButton > button:hover {
@@ -158,11 +145,11 @@ body {
     )
 
     # Logout button in header
-    col_logout = st.columns([8, 2])
-    with col_logout[1]:
-        if st.button("🚪 Logout", use_container_width=True, key="emp_logout_btn"):
-            on_logout()
+    header_left, header_right = st.columns([9, 1])
 
+    with header_right:
+        if st.button("🚪", key="emp_logout_btn", help="Logout"):
+            on_logout()
     # Card-like Container
     with st.container(border=True):
 
@@ -215,9 +202,14 @@ I am unable to connect to the VPN while working remotely.
         )
 
         # Center the submit button at the bottom
-        button_col1, button_col2, button_col3 = st.columns([1, 1, 1])
-        with button_col2:
-            submitted = st.button(" Submit Ticket")
+        left, center, right = st.columns([2, 1, 2])
+
+        with center:
+            submitted = st.button(
+                "📩 Submit Ticket",
+                use_container_width=True,
+                type="primary"
+            )
 
     if submitted:
 

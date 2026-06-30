@@ -57,5 +57,5 @@ def show():
     st.divider()
 
     if st.button("⬅ Back to Admin"):
-        st.session_state["page"] = "admin"
+        st.session_state["page"] = "admin_dashboard"
         st.rerun()
