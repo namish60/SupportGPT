@@ -117,10 +117,10 @@ def show(on_logout):
 
     st.subheader("📋 All Support Tickets")
 
-    if all_tickets:
+    if open_tickets:
         # Prepare data for display
         table_data = []
-        for ticket in all_tickets:
+        for ticket in open_tickets:
             table_data.append({
                 "Ticket ID": ticket[0],
                 "Employee Name": ticket[1],
@@ -150,7 +150,7 @@ def show(on_logout):
         st.subheader("🔍 Ticket Details Viewer")
         
         # Create a selectbox to choose a ticket
-        ticket_options = {f"{t[0]} - {t[1]}": t[0] for t in all_tickets}
+        ticket_options = {f"{t[0]} - {t[1]}": t[0] for t in open_tickets}
         selected_ticket_label = st.selectbox(
             "Select a ticket to view details:",
             list(ticket_options.keys())
@@ -162,21 +162,46 @@ def show(on_logout):
         if selected_ticket:
             left,right=st.columns([2,1])
 
+            # with left:
+
+            #     with st.container(border=True):
+
+            #         st.subheader("🎫 Ticket Details")
+
+            #         st.write(f"**Ticket ID:** {selected_ticket[0]}")
+            #         st.write(f"**Employee Name:** {selected_ticket[1]}")
+            #         st.write(f"**Employee ID:** {selected_ticket[2]}")
+            #         st.write(f"**Department:** {selected_ticket[3]}")
+            #         st.write(f"**Priority:** {selected_ticket[4]}")
+            #         st.write(f"**Status:** {selected_ticket[7]}")
+            #         st.write(f"**Submitted Date:** {selected_ticket[6]}")
+
+            #         st.write("### 📝 Issue Description")
+
+            #         st.info(selected_ticket[5])
+
             with left:
 
                 with st.container(border=True):
 
                     st.subheader("🎫 Ticket Details")
 
-                    st.write(f"**Ticket ID:** {selected_ticket[0]}")
-                    st.write(f"**Employee Name:** {selected_ticket[1]}")
-                    st.write(f"**Employee ID:** {selected_ticket[2]}")
-                    st.write(f"**Department:** {selected_ticket[3]}")
-                    st.write(f"**Priority:** {selected_ticket[4]}")
-                    st.write(f"**Status:** {selected_ticket[7]}")
-                    st.write(f"**Submitted Date:** {selected_ticket[6]}")
+                    info1, info2 = st.columns(2)
 
-                    st.write("### 📝 Issue Description")
+                    with info1:
+                        st.write(f"**🆔 Ticket ID:** {selected_ticket[0]}")
+                        st.write(f"**👤 Employee:** {selected_ticket[1]}")
+                        st.write(f"**🪪 Employee ID:** {selected_ticket[2]}")
+
+                    with info2:
+                        st.write(f"**🏢 Department:** {selected_ticket[3]}")
+                        st.write(f"**🚦 Priority:** {selected_ticket[4]}")
+                        st.write(f"**📌 Status:** {selected_ticket[7]}")
+
+                    st.write(f"**📅 Submitted:** {selected_ticket[6]}")
+
+
+                    st.subheader("📝 Issue Description")
 
                     st.info(selected_ticket[5])
 
@@ -227,11 +252,11 @@ def show(on_logout):
                         st.rerun()
                         
 
-                    st.divider()
+                    # st.divider()
 
-                    st.subheader("📊 Stats")
-                    st.write(f"**Current Status:** {selected_ticket[7]}")
-                    st.write(f"**Priority Level:** {selected_ticket[4]}")
+                    # st.subheader("📊 Stats")
+                    # st.write(f"**Current Status:** {selected_ticket[7]}")
+                    # st.write(f"**Priority Level:** {selected_ticket[4]}")
 
                     
 

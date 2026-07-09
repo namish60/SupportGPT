@@ -4,7 +4,8 @@ from datetime import datetime
 from database import (
     save_ticket,
     init_database,
-    check_duplicate_open_ticket
+    check_duplicate_open_ticket,
+    get_tickets_by_employee
 )
 
 def show(on_logout):
